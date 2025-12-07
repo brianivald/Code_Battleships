@@ -155,8 +155,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -39, y: -187}
-  m_SizeDelta: {x: 521.3489, y: 184.5078}
+  m_AnchoredPosition: {x: 0, y: -440}
+  m_SizeDelta: {x: 397.3866, y: 163.2018}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &198208882
 MonoBehaviour:
@@ -271,8 +271,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
   prefabBarco: {fileID: 1982503059047545538, guid: df91e780e6d0a1c418b609603022a81b, type: 3}
-  puntosDeSpawn: []
   gameUI: {fileID: 374234055}
+  totalRondas: 0
 --- !u!4 &374234054
 Transform:
   m_ObjectHideFlags: 0
@@ -564,8 +564,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -59, y: 122}
-  m_SizeDelta: {x: 1233.181, y: 140.2254}
+  m_AnchoredPosition: {x: 2.6436, y: 234.5607}
+  m_SizeDelta: {x: 1316.4684, y: 163.1027}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1071755513
 MonoBehaviour:
@@ -614,8 +614,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 127.5
-  m_fontSizeBase: 127.5
+  m_fontSize: 100
+  m_fontSizeBase: 100
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -700,8 +700,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 119, y: 418}
-  m_SizeDelta: {x: 1423.1663, y: 190.4668}
+  m_AnchoredPosition: {x: -39, y: 445.74}
+  m_SizeDelta: {x: 1014.4783, y: 188.5299}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1113521808
 MonoBehaviour:
@@ -750,8 +750,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 212.59
-  m_fontSizeBase: 212.59
+  m_fontSize: 185
+  m_fontSizeBase: 185
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1007,8 +1007,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.000045776367, y: 0.0000076293945}
+  m_SizeDelta: {x: -0.000061035, y: -0.000015259}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2005122156
 MonoBehaviour:
@@ -1057,8 +1057,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 83.7
-  m_fontSizeBase: 83.7
+  m_fontSize: 75
+  m_fontSizeBase: 75
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

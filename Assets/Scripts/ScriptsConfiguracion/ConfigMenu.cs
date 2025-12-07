@@ -11,7 +11,7 @@ public class ConfigMenu : MonoBehaviour
     public TMP_InputField inputReparaciones;
     public TMP_InputField inputDanoCanon;
     public TMP_InputField inputDanoTorpedo;
-
+    public TMP_InputField inputRondas;
     // Esta función la llamarás desde el botón "Continuar" o "Guardar"
     public void GuardarYContinuar()
     {
@@ -38,6 +38,9 @@ public class ConfigMenu : MonoBehaviour
             
         if (!string.IsNullOrEmpty(inputDanoTorpedo.text)) 
             GameSession.danoTorpedo = int.Parse(inputDanoTorpedo.text);
+
+        if (!string.IsNullOrEmpty(inputRondas.text)) 
+            GameSession.rondas = int.Parse(inputRondas.text);
 
         Debug.Log("Configuración Guardada. Tablero: " + GameSession.tamanoTablero);
 

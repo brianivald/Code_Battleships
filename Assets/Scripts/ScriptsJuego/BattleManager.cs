@@ -11,7 +11,7 @@ public class BattleManager : MonoBehaviour
     public GameUI gameUI;
     
     [Header("Torneo")]
-    public int totalRondas = 3;
+    public int totalRondas = 0;
 
     // --- VARIABLES GLOBALES (Sobreviven al reinicio de escena) ---
     public static int rondaActual = 1;
@@ -22,6 +22,7 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
+        totalRondas = GameSession.rondas;
         if (GameSession.jugadoresListos.Count == 0)
         {
             Debug.LogWarning("Modo prueba.");
