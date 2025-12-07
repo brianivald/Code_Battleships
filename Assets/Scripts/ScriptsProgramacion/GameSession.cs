@@ -1,9 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public static class GameSession
+public class GameSession : MonoBehaviour
 {
-    // Aquí guardaremos la info de cada jugador listo
+    // --- CONFIGURACIÃ“N DE LA PARTIDA (Global) ---
+    public static int tamanoTablero = 10; // Por defecto 10x10
+    public static int minasMaximas = 3;
+    public static int reparacionesMaximas = 3;
+    public static int saludMaxima = 100;
+    public static int danoCanon = 25;
+    public static int danoTorpedo = 40;
+    
+    // Aquï¿½ guardaremos la info de cada jugador listo
     public class PlayerData
     {
         public int playerID;
@@ -21,4 +29,5 @@ public static class GameSession
     {
         jugadoresListos.Clear();
     }
+    
 }

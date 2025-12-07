@@ -11,13 +11,17 @@ public class GameUI : MonoBehaviour
     public void MostrarVictoria(string nombreGanador, Color colorGanador)
     {
         panelGameOver.SetActive(true);
-        textoGanador.text = "¡Ganador: " + nombreGanador + "!";
+        textoGanador.text = "ï¿½Ganador: " + nombreGanador + "!";
         textoGanador.color = colorGanador;
     }
 
     public void IrAlMenu()
     {
-        // Asegúrate de usar el nombre correcto de tu escena de menú
+        // Asegï¿½rate de usar el nombre correcto de tu escena de menï¿½
         SceneManager.LoadScene("MainMenu");
+    }
+    public void OcultarPanel()
+    {
+        panelGameOver.SetActive(false);
     }
 }

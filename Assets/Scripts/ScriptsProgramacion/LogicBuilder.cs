@@ -14,18 +14,18 @@ public class LogicBuilder : MonoBehaviour
     [Header("Botones de Comando")]
     public Button btnMover, btnTorpedo, btnPlantarMina, btnCanon, btnIf, btnReparar;
 
-    [Header("Botones de Par·metros")]
+    [Header("Botones de ParÔøΩmetros")]
     public Button btnNorte, btnSur, btnEste, btnOeste;
     public Button btnSalud, btnRadar;
     public Button btnMenorQue, btnMayorQue, btnIgualA, btnMenos;
 
-    [Header("Botones NumÈricos (0-9)")]
+    [Header("Botones NumÔøΩricos (0-9)")]
     public Button[] botonesNumeros;
 
     [Header("Botones de Control")]
     public Button btnBorrar, btnGuardar;
 
-    [Header("ConexiÛn al Manager")]
+    [Header("ConexiÔøΩn al Manager")]
     public ProgrammingManager manager;
 
     // --- Estado Interno ---
@@ -41,9 +41,9 @@ public class LogicBuilder : MonoBehaviour
         EsperandoDireccion,
         EsperandoDirCanon1, EsperandoDirCanon2, EsperandoNumCanon,
         EsperandoCondicionIf,
-        EsperandoDirRadar,      // DirecciÛn del Radar
+        EsperandoDirRadar,      // DirecciÔøΩn del Radar
         EsperandoOperadorIf,
-        EsperandoValorIf,       // Valor genÈrico (Salud)
+        EsperandoValorIf,       // Valor genÔøΩrico (Salud)
         EsperandoValorRadar     // NUEVO: Estado especial restrictivo para Radar
     }
     private EstadoConstruccion estadoActual;
@@ -105,22 +105,26 @@ public class LogicBuilder : MonoBehaviour
     }
 
     // --- Iniciar Comandos ---
+    // En LogicBuilder.cs
+
     void IniciarComando(string nombreComando, EstadoConstruccion siguienteEstado)
     {
-        // Cierre autom·tico de n˙mero si venimos de escribir Salud
-        if (estadoActual == EstadoConstruccion.EsperandoValorIf)
+        // CORRECCI√ìN AQU√ç:
+        // Antes solo revisaba EsperandoValorIf. Ahora revisamos ambos.
+        if (estadoActual == EstadoConstruccion.EsperandoValorIf || 
+            estadoActual == EstadoConstruccion.EsperandoValorRadar)
         {
-            if (string.IsNullOrEmpty(bufferNumerico) || bufferNumerico == "-") return;
+            // Si el buffer est√° vac√≠o o es solo un menos, no dejamos avanzar
+            if (string.IsNullOrEmpty(bufferNumerico) || bufferNumerico == "-") return; 
+            
             ProcesarBufferNumericoIf();
         }
 
-        if (lineaEnConstruccion.StartsWith("IF("))
-        {
+        // ... (El resto de la funci√≥n sigue igual) ...
+        if (lineaEnConstruccion.StartsWith("IF(")) {
             comandoBase = nombreComando + "_IF";
             lineaEnConstruccion += nombreComando + "(";
-        }
-        else
-        {
+        } else {
             comandoBase = nombreComando;
             lineaEnConstruccion = nombreComando + "(";
         }
@@ -133,7 +137,7 @@ public class LogicBuilder : MonoBehaviour
     void OnClick_Mover() => IniciarComando("MOVER", EstadoConstruccion.EsperandoDireccion);
     void OnClick_Torpedo() => IniciarComando("TORPEDO", EstadoConstruccion.EsperandoDireccion);
     void OnClick_PlantarMina() => IniciarComando("PLANTAR_MINA", EstadoConstruccion.EsperandoDireccion);
-    void OnClick_Canon() => IniciarComando("CA—ON", EstadoConstruccion.EsperandoDirCanon1);
+    void OnClick_Canon() => IniciarComando("CAÔøΩON", EstadoConstruccion.EsperandoDirCanon1);
 
     void OnClick_If()
     {
@@ -144,11 +148,11 @@ public class LogicBuilder : MonoBehaviour
         ActualizarBotonesUI();
     }
 
-    // --- LÛgica IF y Radar ---
+    // --- LÔøΩgica IF y Radar ---
 
     void OnClick_RadarInicio()
     {
-        // Solo pide direcciÛn, ya no pide rango
+        // Solo pide direcciÔøΩn, ya no pide rango
         lineaEnConstruccion += "RADAR(";
         estadoActual = EstadoConstruccion.EsperandoDirRadar;
         RefrescarTextoScript();
@@ -170,7 +174,7 @@ public class LogicBuilder : MonoBehaviour
         string opStr = (op == Operador.MenorQue) ? "<" : (op == Operador.MayorQue ? ">" : "=");
         lineaEnConstruccion += opStr;
 
-        // DECISI”N: øQuÈ sigue?
+        // DECISIÔøΩN: ÔøΩQuÔøΩ sigue?
         if (lineaEnConstruccion.Contains("RADAR"))
         {
             // Si es RADAR, vamos al estado restrictivo (Solo 0)
@@ -189,7 +193,13 @@ public class LogicBuilder : MonoBehaviour
 
     void OnClick_Menos()
     {
-        if (estadoActual == EstadoConstruccion.EsperandoValorIf && string.IsNullOrEmpty(bufferNumerico))
+        // CORRECCI√ìN: Ahora verificamos si estamos en CUALQUIERA de los dos estados
+        // (Ya sea esperando valor de salud O esperando valor de radar)
+        bool esEstadoValido = (estadoActual == EstadoConstruccion.EsperandoValorIf || 
+                               estadoActual == EstadoConstruccion.EsperandoValorRadar);
+
+        // Solo escribe el menos si el estado es v√°lido y no hemos escrito nada a√∫n
+        if (esEstadoValido && string.IsNullOrEmpty(bufferNumerico))
         {
             bufferNumerico = "-";
             lineaEnConstruccion += "-";
@@ -204,21 +214,10 @@ public class LogicBuilder : MonoBehaviour
         {
             FinalizarComandoCanon(num);
         }
-        else if (estadoActual == EstadoConstruccion.EsperandoValorRadar)
+       else if (estadoActual == EstadoConstruccion.EsperandoValorIf || 
+                 estadoActual == EstadoConstruccion.EsperandoValorRadar)
         {
-            // RESTRICCI”N: Solo aceptamos 0
-            if (num == 0)
-            {
-                ifValor = 0;
-                lineaEnConstruccion += "0): "; // Cerramos parÈntesis y preparamos acciÛn
-                // Truco: No cambiamos de estado "oficialmente" en el enum, 
-                // pero ActualizarBotonesUI detectar· que acabamos de cerrar el IF
-                // y habilitar· los botones de acciÛn.
-            }
-        }
-        else if (estadoActual == EstadoConstruccion.EsperandoValorIf)
-        {
-            if (bufferNumerico.Length < 4)
+            if (bufferNumerico.Length < 4) 
             {
                 bufferNumerico += num.ToString();
                 lineaEnConstruccion += num.ToString();
@@ -258,9 +257,9 @@ public class LogicBuilder : MonoBehaviour
                 dirCanon2 = dir; lineaEnConstruccion += dirStr + ","; estadoActual = EstadoConstruccion.EsperandoNumCanon; break;
 
             case EstadoConstruccion.EsperandoDirRadar:
-                // Radar Simplificado: DirecciÛn -> Operador
+                // Radar Simplificado: DirecciÔøΩn -> Operador
                 ifCondicion = ObtenerTipoRadar(dir);
-                lineaEnConstruccion += dirStr + ")"; // Cerramos parÈntesis aquÌ
+                lineaEnConstruccion += dirStr + ")"; // Cerramos parÔøΩntesis aquÔøΩ
                 estadoActual = EstadoConstruccion.EsperandoOperadorIf;
                 break;
         }
@@ -277,15 +276,21 @@ public class LogicBuilder : MonoBehaviour
         if (comandoBase.Contains("_IF")) FinalizarAccionIf(cmd);
         else { comandosTemporales.Add(cmd); ResetearAIdle(); }
     }
+    // En LogicBuilder.cs
+
     void FinalizarAccionIf(ShipCommand accion)
     {
-        if (estadoActual == EstadoConstruccion.EsperandoValorIf)
+        // CORRECCI√ìN AQU√ç TAMBI√âN:
+        // A√±adimos la condici√≥n "|| estadoActual == EstadoConstruccion.EsperandoValorRadar"
+        if (estadoActual == EstadoConstruccion.EsperandoValorIf || 
+            estadoActual == EstadoConstruccion.EsperandoValorRadar)
         {
             if (string.IsNullOrEmpty(bufferNumerico) || bufferNumerico == "-") return;
             ProcesarBufferNumericoIf();
         }
-        if (!lineaEnConstruccion.EndsWith("REPARAR")) lineaEnConstruccion += ")";
 
+        if (!lineaEnConstruccion.EndsWith("REPARAR")) lineaEnConstruccion += ")";
+        
         // Pasamos 0 como rango (ya no se usa, o usa el default del Controlador)
         ShipCommand comandoIf = new IfCommand(ifCondicion, ifOperador, ifValor, 0, accion);
         comandosTemporales.Add(comandoIf);
@@ -346,24 +351,24 @@ public class LogicBuilder : MonoBehaviour
             case EstadoConstruccion.EsperandoOperadorIf: SetGrupoBotones(true, btnMenorQue, btnMayorQue, btnIgualA); break;
 
             case EstadoConstruccion.EsperandoValorIf:
-                // LÛgica libre para Salud (acepta menos y numeros)
+            case EstadoConstruccion.EsperandoValorRadar: // <--- ¬°JUNTAMOS LOS DOS CASOS!
+                
+                // Permitimos todos los n√∫meros
                 SetGrupoBotones(true, botonesNumeros);
-                if (string.IsNullOrEmpty(bufferNumerico) && btnMenos != null) btnMenos.interactable = true;
+
+                // Permitimos el bot√≥n Menos (si est√° al inicio)
+                if (string.IsNullOrEmpty(bufferNumerico) && btnMenos != null) 
+                    btnMenos.interactable = true;
+
+                // Permitimos Acciones si ya hay un n√∫mero v√°lido escrito
                 bool hayNumeroValido = !string.IsNullOrEmpty(bufferNumerico) && bufferNumerico != "-";
-                if (hayNumeroValido) SetGrupoBotones(true, btnMover, btnTorpedo, btnPlantarMina, btnCanon, btnReparar);
-                break;
-
-            case EstadoConstruccion.EsperandoValorRadar:
-                // RESTRICCI”N ESTRICTA PARA RADAR: Solo el 0
-                botonesNumeros[0].interactable = true; // Solo el botÛn "0"
-
-                // Si ya se presionÛ el 0 (la linea termina en "0): "), habilitamos acciones
-                if (lineaEnConstruccion.EndsWith("0): "))
+                
+                if (hayNumeroValido)
                 {
                     SetGrupoBotones(true, btnMover, btnTorpedo, btnPlantarMina, btnCanon, btnReparar);
-                    SetGrupoBotones(false, botonesNumeros); // Bloqueamos n˙meros para que no ponga "00"
                 }
                 break;
+
         }
     }
 }

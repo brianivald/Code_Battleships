@@ -5,17 +5,20 @@ using static Tablero;
 
 public class ControladorDeBarco : MonoBehaviour
 {
-    [Header("Configuración")]
+    [Header("IdentificaciÃ³n")]
+    public int idJugador; // <--- NUEVO: Para saber a quiÃ©n sumar el punto
+    [Header("Configuraciï¿½n")]
     public float velocidadAnimacion = 2.0f;
-    public int salud = 100;
-    public int minasRestantes = 5;
+    public int salud = 0;
+    public int minasRestantes = 0;
+    public int reparacionesRestantes = 0;
 
     [Header("Referencias Visuales")]
     public GameObject prefabBala;
     public GameObject prefabTorpedo;
     public GameObject prefabMina;
 
-    // Posición lógica en el tablero (X, Y)
+    // Posiciï¿½n lï¿½gica en el tablero (X, Y)
     public Vector2Int posicionGrid;
     public Direccion orientacionActual = Direccion.Norte;
 
@@ -23,7 +26,14 @@ public class ControladorDeBarco : MonoBehaviour
     public List<ShipCommand> misComandos;
     private int indiceComando = 0;
 
-    // --- Lógica de Ejecución de Turno ---
+    void Start()
+    {
+        salud = GameSession.saludMaxima;
+        minasRestantes = GameSession.minasMaximas;
+        reparacionesRestantes = GameSession.reparacionesMaximas;
+    }
+
+    // --- Lï¿½gica de Ejecuciï¿½n de Turno ---
 
     public void EjecutarSiguienteComando()
     {
@@ -52,21 +62,21 @@ public class ControladorDeBarco : MonoBehaviour
             // 1. Checar si pisamos una mina ANTES de movernos
             if (Tablero.Instance.GetContenido(nuevaPos) == Tablero.TipoCelda.Mina)
             {
-                Debug.Log("¡BOOM! Has pisado una mina.");
+                Debug.Log("ï¿½BOOM! Has pisado una mina.");
                 RecibirDano(50);
 
-                // Destruir la mina visual y lógica
+                // Destruir la mina visual y lï¿½gica
                 GameObject minaObj = Tablero.Instance.GetObjetoEn(nuevaPos);
                 if (minaObj != null) Destroy(minaObj);
                 Tablero.Instance.EliminarObjeto(nuevaPos);
             }
 
-            // 2. Mover Lógicamente
+            // 2. Mover Lï¿½gicamente
             Tablero.Instance.MoverObjeto(posicionGrid, nuevaPos, Tablero.TipoCelda.Barco, this.gameObject);
             posicionGrid = nuevaPos;
 
             // 3. Mover Visualmente
-            float scale = Tablero.Instance.tamañoCelda;
+            float scale = Tablero.Instance.tamaÃ±oCelda;
             transform.position = new Vector3(posicionGrid.x * scale, transform.position.y, posicionGrid.y * scale);
 
             RotarVisualmente(dir);
@@ -74,33 +84,33 @@ public class ControladorDeBarco : MonoBehaviour
         }
         else
         {
-            // --- AQUÍ ESTÁ EL CAMBIO PARA EL DAÑO ---
+            // --- AQUï¿½ ESTï¿½ EL CAMBIO PARA EL DAï¿½O ---
 
             TipoCelda obstaculo = Tablero.Instance.GetContenido(nuevaPos);
 
             // CASO 1: Choque contra PARED (Fuera del mapa)
             if (obstaculo == Tablero.TipoCelda.FueraDeLimites)
             {
-                Debug.Log($"¡CRASH! {gameObject.name} chocó contra la costa.");
-                RecibirDano(15); // Daño por chocar con tierra
+                Debug.Log($"ï¿½CRASH! {gameObject.name} chocï¿½ contra la costa.");
+                RecibirDano(15); // Daï¿½o por chocar con tierra
             }
 
             // CASO 2: Choque contra OTRO BARCO (Ramming)
             else if (obstaculo == Tablero.TipoCelda.Barco)
             {
-                Debug.Log($"¡PUM! {gameObject.name} embistió a otro barco.");
+                Debug.Log($"ï¿½PUM! {gameObject.name} embistiï¿½ a otro barco.");
 
-                // 1. Me hago daño a mí mismo
+                // 1. Me hago daï¿½o a mï¿½ mismo
                 RecibirDano(20);
 
-                // 2. Le hago daño al que golpeé
+                // 2. Le hago daï¿½o al que golpeï¿½
                 GameObject otroBarcoObj = Tablero.Instance.GetObjetoEn(nuevaPos);
                 if (otroBarcoObj != null)
                 {
                     ControladorDeBarco enemigo = otroBarcoObj.GetComponent<ControladorDeBarco>();
                     if (enemigo != null)
                     {
-                        enemigo.RecibirDano(20); // El otro también sufre
+                        enemigo.RecibirDano(20); // El otro tambiï¿½n sufre
                     }
                 }
             }
@@ -120,19 +130,19 @@ public class ControladorDeBarco : MonoBehaviour
         Vector2Int offset = (vector1 + vector2) * distancia;
         Vector2Int coordenadaObjetivo = posicionGrid + offset;
 
-        Debug.Log($"DISPARANDO CAÑÓN a {coordenadaObjetivo}");
+        Debug.Log($"DISPARANDO CAï¿½ï¿½N a {coordenadaObjetivo}");
 
         // Efecto Visual (Bala)
         if (prefabBala != null)
         {
-            float scale = Tablero.Instance.tamañoCelda;
+            float scale = Tablero.Instance.tamaÃ±oCelda;
             Vector3 destinoVisual = new Vector3(coordenadaObjetivo.x * scale, transform.position.y, coordenadaObjetivo.y * scale);
 
             GameObject bala = Instantiate(prefabBala, transform.position, Quaternion.identity);
             bala.GetComponent<Proyectil>().Configurar(destinoVisual);
         }
 
-        // Lógica de Impacto
+        // Lï¿½gica de Impacto
         if (Tablero.Instance.EsCoordenadaValida(coordenadaObjetivo))
         {
             if (Tablero.Instance.GetContenido(coordenadaObjetivo) == Tablero.TipoCelda.Barco)
@@ -141,7 +151,7 @@ public class ControladorDeBarco : MonoBehaviour
                 if (objetoGolpeado != null)
                 {
                     ControladorDeBarco enemigo = objetoGolpeado.GetComponent<ControladorDeBarco>();
-                    if (enemigo != null) enemigo.RecibirDano(25);
+                    if (enemigo != null) enemigo.RecibirDano(GameSession.danoCanon);
                 }
             }
         }
@@ -157,7 +167,7 @@ public class ControladorDeBarco : MonoBehaviour
         bool impactoEncontrado = false;
         GameObject objetivoGolpeado = null;
 
-        // Raycast lógico para encontrar impacto
+        // Raycast lï¿½gico para encontrar impacto
         for (int i = 1; i < 20; i++)
         {
             Vector2Int posTest = posicionGrid + (vectorDir * i);
@@ -180,7 +190,7 @@ public class ControladorDeBarco : MonoBehaviour
         // Efecto Visual
         if (prefabTorpedo != null)
         {
-            float scale = Tablero.Instance.tamañoCelda;
+            float scale = Tablero.Instance.tamaÃ±oCelda;
             GameObject torpedo = Instantiate(prefabTorpedo, transform.position, Quaternion.identity);
             Vector3 destinoVisual = new Vector3(posImpacto.x * scale, transform.position.y, posImpacto.y * scale);
 
@@ -188,11 +198,11 @@ public class ControladorDeBarco : MonoBehaviour
             torpedo.transform.LookAt(destinoVisual);
         }
 
-        // Daño
+        // Daï¿½o
         if (impactoEncontrado && objetivoGolpeado != null)
         {
             ControladorDeBarco enemigo = objetivoGolpeado.GetComponent<ControladorDeBarco>();
-            if (enemigo != null) enemigo.RecibirDano(40);
+            if (enemigo != null) enemigo.RecibirDano(GameSession.danoTorpedo);
         }
     }
 
@@ -206,17 +216,17 @@ public class ControladorDeBarco : MonoBehaviour
 
         Vector2Int casillaAnterior = posicionGrid;
 
-        // Intentamos movernos (aquí ocurre el choque si hay obstáculo)
+        // Intentamos movernos (aquï¿½ ocurre el choque si hay obstï¿½culo)
         MoverHacia(dir);
 
         // Verificamos si logramos movernos
         if (posicionGrid != casillaAnterior)
         {
-            // Lógica NORMAL (Salió bien)
+            // Lï¿½gica NORMAL (Saliï¿½ bien)
             Tablero.Instance.RegistrarObjeto(casillaAnterior, Tablero.TipoCelda.Mina, null);
             if (prefabMina != null)
             {
-                float scale = Tablero.Instance.tamañoCelda;
+                float scale = Tablero.Instance.tamaÃ±oCelda;
                 Vector3 posVisual = new Vector3(casillaAnterior.x * scale, 0.2f, casillaAnterior.y * scale);
                 GameObject minaObj = Instantiate(prefabMina, posVisual, Quaternion.identity);
                 Tablero.Instance.RegistrarObjeto(casillaAnterior, Tablero.TipoCelda.Mina, minaObj);
@@ -226,35 +236,60 @@ public class ControladorDeBarco : MonoBehaviour
         }
         else
         {
-            // --- LÓGICA KAMIKAZE (Salió mal) ---
-            Debug.Log("¡CRÍTICO! Chocaste y se te cayó la mina en los pies.");
+            // --- Lï¿½GICA KAMIKAZE (Saliï¿½ mal) ---
+            Debug.Log("ï¿½CRï¿½TICO! Chocaste y se te cayï¿½ la mina en los pies.");
 
             // 1. Gastas la mina
             minasRestantes--;
 
-            // 2. Te comes el daño instantáneo
-            RecibirDano(50); // ¡PUM!
+            // 2. Te comes el daï¿½o instantï¿½neo
+            RecibirDano(50); // ï¿½PUM!
 
-            // 3. (Opcional) Instanciar explosión visual aquí
+            // 3. (Opcional) Instanciar explosiï¿½n visual aquï¿½
             // Instantiate(prefabExplosion, transform.position, ...);
         }
     }
 
-    public void Reparar()
+   public void Reparar()
     {
-        int vidaAnterior = salud;
-        salud += 20;
-        if (salud > 100) salud = 100;
-        Debug.Log($"Reparando... {vidaAnterior} -> {salud}");
-        StartCoroutine(EfectoColor(Color.green));
+        // 1. Checar si tengo "kits de reparaciÃ³n" disponibles
+        if (reparacionesRestantes > 0)
+        {
+            // 2. Calcular curaciÃ³n (Digamos que curas un 20% de la salud mÃ¡xima o fijo 20)
+            int cantidadCuracion = 20; 
+            int vidaAnterior = salud;
+            
+            salud += cantidadCuracion;
+
+            // 3. Tope de salud (No pasar de la Salud MÃ¡xima Configurada)
+            if (salud > GameSession.saludMaxima) 
+            {
+                salud = GameSession.saludMaxima;
+            }
+
+            // 4. Gastar el uso
+            reparacionesRestantes--;
+
+            Debug.Log($"Reparando... Vida: {vidaAnterior} -> {salud}. Kits restantes: {reparacionesRestantes}");
+            
+            // Efecto visual
+            StartCoroutine(EfectoColor(Color.green));
+        }
+        else
+        {
+            // 5. Si no quedan usos
+            Debug.Log("Â¡No te quedan reparaciones! El comando se desperdiciÃ³.");
+            
+            // Opcional: PodrÃ­as hacer un sonido de "Error" visual aquÃ­
+        }
     }
 
-    // --- SALUD Y DAÑO ---
+    // --- SALUD Y DAï¿½O ---
 
     public void RecibirDano(int cantidad)
     {
         salud -= cantidad;
-        Debug.Log($"{gameObject.name} recibió daño. Salud: {salud}");
+        Debug.Log($"{gameObject.name} recibiï¿½ daï¿½o. Salud: {salud}");
         StartCoroutine(EfectoColor(Color.red));
 
         if (salud <= 0) Morir();
@@ -269,7 +304,10 @@ public class ControladorDeBarco : MonoBehaviour
 
     // --- AI Y RADAR ---
 
-    public int GetCondicionValor(CondicionTipo tipo, int rango)
+   // En ControladorDeBarco.cs
+
+    // Modificamos GetCondicionValor para asegurar que el rango mÃ¡ximo sea 10 (regla del juego)
+    public int GetCondicionValor(CondicionTipo tipo, int parametroExtra)
     {
         if (tipo == CondicionTipo.Salud) return salud;
 
@@ -281,21 +319,38 @@ public class ControladorDeBarco : MonoBehaviour
             case CondicionTipo.Radar_E: dir = Direccion.Este; break;
             case CondicionTipo.Radar_O: dir = Direccion.Oeste; break;
         }
-        return EscanearGrid(dir, rango);
+        
+        // Regla: Escanear hasta 10 casillas mÃ¡ximo
+        return EscanearGrid(dir, 10); 
     }
 
-    private int EscanearGrid(Direccion dir, int distancia)
+    private int EscanearGrid(Direccion dir, int distanciaMax)
     {
         Vector2Int vectorDir = ObtenerVectorDireccion(dir);
-        for (int i = 1; i <= distancia; i++)
+
+        // Iteramos desde la casilla 1 hasta la 10 (o distanciaMax)
+        for (int i = 1; i <= distanciaMax; i++)
         {
             Vector2Int posRevisar = posicionGrid + (vectorDir * i);
             Tablero.TipoCelda contenido = Tablero.Instance.GetContenido(posRevisar);
 
-            if (contenido == Tablero.TipoCelda.FueraDeLimites) return -1;
-            if (contenido == Tablero.TipoCelda.Barco) return 1;
-            if (contenido == Tablero.TipoCelda.Mina) return 2; // Opcional
+            // CASO A: OBSTÃCULO (Pared o Mina) -> Devuelve distancia NEGATIVA (-i)
+            // El usuario pidiÃ³ no distinguir entre mina y pared, ambos son obstÃ¡culos.
+            if (contenido == Tablero.TipoCelda.FueraDeLimites || 
+                contenido == Tablero.TipoCelda.Pared || 
+                contenido == Tablero.TipoCelda.Mina) 
+            {
+                return -i; // Ej: Si estÃ¡ a 3 casillas, devuelve -3
+            }
+
+            // CASO B: BARCO -> Devuelve distancia POSITIVA (i)
+            if (contenido == Tablero.TipoCelda.Barco)
+            {
+                return i; // Ej: Si estÃ¡ a 5 casillas, devuelve 5
+            }
         }
+
+        // Si no encontrÃ³ nada en el rango de 10 casillas
         return 0;
     }
 
