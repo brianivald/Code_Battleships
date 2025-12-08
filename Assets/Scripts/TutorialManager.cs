@@ -14,17 +14,17 @@ public class TutorialManager : MonoBehaviour
     {
         switch (instruccion)
         {
-            case "Direccion":
+            case "Dirección":
                 textoDescripcion.text = 
                     "Cuando una instrucción requiere una Dirección se refiere a alguno de los cuatro puntos cardinales: N, S, E, O";
                 break;
 
             case "Mover":
                 textoDescripcion.text =
-                    "<b>Instrucción:</b> MOVER(DIRECCION)\n\n" +
+                    "<b>Instrucción:</b> MOVER(DIRECCIÓN)\n\n" +
                     "<b>Explicación:</b> Desplaza la unidad una casilla en la dirección establecida (si está en el área de movimiento).\n\n" +
 
-                    "Parámetro <b>DIRECCION:</b> N, S, E, O.\n" +
+                    "Parámetro <b>DIRECCIÓN:</b> N, S, E, O.\n" +
                     "<b>Explicación del parámetro:</b> Valores permitidos para indicar la dirección del submarino:\n" +
                     "• N = Norte\n" +
                     "• S = Sur\n" +
@@ -38,12 +38,12 @@ public class TutorialManager : MonoBehaviour
 
             case "Plantar mina":
                 textoDescripcion.text =
-                    "<b>Instrucción:</b> PLANTAR_MINA(DIRECCION_DE_SALIDA)\n\n" +
+                    "<b>Instrucción:</b> PLANTAR_MINA(DIRECCIÓN_DE_SALIDA)\n\n" +
                     "<b>Explicación:</b> Coloca una mina en la ubicación actual del jugador. " +
                     "Después de plantarla, el submarino del jugador se mueve una casilla en la dirección indicada " +
                     "para evitar entrar en contacto con la mina.\n\n" +
 
-                    "Parámetro <b>DIRECCION_DE_SALIDA:</b> N, S, E, O.\n" +
+                    "Parámetro <b>DIRECCIÓN_DE_SALIDA:</b> N, S, E, O.\n" +
                     "<b>Explicación del parámetro:</b> Dirección en la cual el submarino se moverá una casilla después de plantar la mina.\n\n" +
 
                     "<b>Ejemplo:</b> <color=#00BFFF>PLANTAR_MINA(E)</color> — planta una mina e intenta moverse una casilla hacia el Este.\n\n" +
@@ -52,16 +52,16 @@ public class TutorialManager : MonoBehaviour
                     "el submarino no se mueve y recibe el daño de la mina.";
                 break;
 
-            case "Cañon":
+            case "Cañón":
                 textoDescripcion.text =
-                    "<b>Instrucción:</b> CAÑON (<DIRECCIÓN, DIRECCIÓN, ALCANCE>)\n\n" +
+                    "<b>Instrucción:</b> CAÑÓN (<DIRECCIÓN, DIRECCIÓN, ALCANCE>)\n\n" +
                     "<b>Explicación:</b> Lanza una bala de cañón a una casilla en específico, si " +
                     "acierta en algún barco el daño que hace es de 35pts de vida, además " +
                     "de que al caer hace daño en área a las 8 casillas vecinas de 15pts de vida.\n\n" +
 
-                    "Parámetro <b><DIRECCION>:</b> N, S.\n" +
+                    "Parámetro <b><DIRECCIÓN>:</b> N, S.\n" +
                     "<b>Explicación:</b> Dirección vertical del disparo.\n\n" +
-                    "Parámetro <b><DIRECCION></b>: E, O.\n" +
+                    "Parámetro <b><DIRECCIÓN></b>: E, O.\n" +
                     "<b>Explicación:</b> Dirección horizontal del disparo.\n\n" +
                     "Parámetro <b><ALCANCE></b>: número.\n" +
                     "<b>Explicación:</b> Distancia a la que caerá el proyectil.\n\n" +
@@ -73,11 +73,11 @@ public class TutorialManager : MonoBehaviour
 
             case "Torpedo":
                 textoDescripcion.text =
-                    "<b>Instrucción:</b> TORPEDO (<DIRECCION>)\n\n" +
+                    "<b>Instrucción:</b> TORPEDO (<DIRECCIÓN>)\n\n" +
                     "<b>Explicación:</b> Lanza un torpedo a lo largo de una fila o columna. " +
                     "Si impacta un barco, este recibe 20 pts de daño.\n\n" +
 
-                    "Parámetro <b><DIRECCION>:</b> N, S, E, O.\n\n" +
+                    "Parámetro <b><DIRECCIÓN>:</b> N, S, E, O.\n\n" +
 
                     "<b>Ejemplo:</b> <color=#00BFFF>TORPEDO(N)</color> — recorre todas las casillas al norte.\n\n" +
 
@@ -102,7 +102,7 @@ public class TutorialManager : MonoBehaviour
 
             case "Radar":
                 textoDescripcion.text =
-                    "<b>Instrucción:</b> RADAR(<DIRECCION>)\n\n" +
+                    "<b>Instrucción:</b> RADAR(<DIRECCIÓN>)\n\n" +
                     "<b>Explicación:</b> Escanea todas las casillas hacia una dirección. " +
                     "Devuelve 1 si detecta barco, -1 si detecta mina o borde.\n\n" +
 

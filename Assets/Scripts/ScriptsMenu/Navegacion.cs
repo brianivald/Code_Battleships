@@ -13,4 +13,11 @@ public class SceneController : MonoBehaviour
     {
         SceneManager.LoadScene("Configuracion");
     }
+    // En GameUI.cs
+
+    public void SalirDelJuego()
+    {
+        Debug.Log("Solicitud de salir del juego recibida."); // Para que veas que funciona en el Editor
+        Application.Quit(); // Esto cierra la ventana del juego real
+    }
 }
