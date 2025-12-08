@@ -371,4 +371,24 @@ public class LogicBuilder : MonoBehaviour
 
         }
     }
+
+    // 1. Para GUARDAR
+    public List<ShipCommand> ObtenerComandosActuales()
+    {
+        // Devolvemos una copia para seguridad
+        return new List<ShipCommand>(comandosTemporales);
+    }
+
+    // 2. Para CARGAR
+    public void CargarScriptExterno(List<ShipCommand> nuevosComandos)
+    {
+        // Reemplazamos la lista actual
+        comandosTemporales = new List<ShipCommand>(nuevosComandos);
+
+        // Reseteamos interfaz
+        ResetearAIdle();
+
+        // ¡Importante! Actualizar visualmente la lista
+        RefrescarTextoScript();
+    }
 }
