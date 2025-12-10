@@ -6,20 +6,25 @@ using System.Collections.Generic;
 
 public class ScriptManager : MonoBehaviour
 {
-    [Header("Referencias UI")]
+    [Header("Referencias UI Principal")]
     public TMP_Dropdown dropdownScripts;
-    public Button btnGuardarScript; // El botón de arriba a la derecha
-    public TMP_InputField inputNombreScript; // Necesitas un lugar para escribir el nombre al guardar
+    public Button btnGuardarScript; // El botón del disquete/guardar
 
-    [Header("UI Emergente")]
-    public GameObject panelOpcionesScript; // Panel con botones "Cargar" y "Borrar"
+    [Header("UI Guardar (Nueva)")]
+    public GameObject panelNombreScript; // El panel que acabamos de crear
+    public TMP_InputField inputNombre;   // Donde escriben el nombre
+    public Button btnConfirmarGuardar;
+    public Button btnCancelarGuardar;
+
+    [Header("UI Cargar/Borrar (Existente)")]
+    public GameObject panelOpcionesScript;
     public Button btnCargar;
     public Button btnBorrar;
-    public Button btnCancelar;
+    public Button btnCancelarOpciones;
 
     [Header("Conexión")]
-    public LogicBuilder logicBuilder; // Para obtener/poner los comandos
-    public ProgrammingManager progManager; // Para saber qué slot estamos editando
+    public LogicBuilder logicBuilder;
+    public ProgrammingManager progManager; // ¡AHORA SÍ LO NECESITAMOS PARA LA ALERTA!
 
     private string filePath;
     private ScriptDataWrapper baseDeDatos;
@@ -27,120 +32,186 @@ public class ScriptManager : MonoBehaviour
 
     void Start()
     {
-        // Ruta de guardado: C:/Users/TuUsuario/AppData/LocalLow/TuEmpresa/TuJuego/mis_scripts.json
         filePath = Path.Combine(Application.persistentDataPath, "mis_scripts.json");
 
         CargarBaseDeDatos();
         ActualizarDropdown();
 
-        // Conexiones
-        btnGuardarScript.onClick.AddListener(OnClick_GuardarNuevo);
-        dropdownScripts.onValueChanged.AddListener(OnDropdownChanged);
+        // 1. Botón Principal (Abre el panel de nombre)
+        btnGuardarScript.onClick.AddListener(AbrirPanelGuardar);
 
-        // Botones del Panel Emergente
+        // 2. Botones del Panel Guardar
+        btnConfirmarGuardar.onClick.AddListener(OnClick_ConfirmarGuardado);
+        btnCancelarGuardar.onClick.AddListener(() => panelNombreScript.SetActive(false));
+
+        // 3. Dropdown y Panel Cargar/Borrar
+        dropdownScripts.onValueChanged.AddListener(OnDropdownChanged);
         btnCargar.onClick.AddListener(OnClick_Cargar);
         btnBorrar.onClick.AddListener(OnClick_Borrar);
-        btnCancelar.onClick.AddListener(() => panelOpcionesScript.SetActive(false));
+        btnCancelarOpciones.onClick.AddListener(() => panelOpcionesScript.SetActive(false));
 
+        // Asegurar que los paneles empiecen cerrados
         panelOpcionesScript.SetActive(false);
+        panelNombreScript.SetActive(false);
     }
 
-    // --- GUARDADO ---
+    // --- LÓGICA DE GUARDADO CON NOMBRE ---
 
-    void OnClick_GuardarNuevo()
+    void AbrirPanelGuardar()
     {
-        // Nota: Deberías activar un panel pequeño que pida el nombre antes de llamar a esto,
-        // o usar el texto del Dropdown si permite escritura. 
-        // Por simplicidad, asumiré que usas un nombre genérico o un InputField que ya tengas.
+        // Limpiamos el input y abrimos el panel
+        inputNombre.text = "";
+        panelNombreScript.SetActive(true);
+    }
 
-        string nombre = "Rutina " + (baseDeDatos.savedScripts.Count + 1);
-        // Si tienes un input field: string nombre = inputNombreScript.text;
+    void OnClick_ConfirmarGuardado()
+    {
+        string nombreElegido = inputNombre.text.Trim(); // Trim quita espacios al inicio/final
 
-        // Obtenemos los comandos actuales del LogicBuilder
-        // OJO: LogicBuilder necesita una forma pública de darnos la lista actual
+        // Validación básica: No guardar sin nombre
+        if (string.IsNullOrEmpty(nombreElegido))
+        {
+            progManager.MostrarAlerta("Error: Escribe un nombre para la rutina.");
+            return;
+        }
+
+        // Obtenemos los comandos actuales
         List<ShipCommand> comandosActuales = logicBuilder.ObtenerComandosActuales();
 
-        if (comandosActuales.Count == 0) return; // No guardar vacíos
+        if (comandosActuales.Count == 0)
+        {
+            progManager.MostrarAlerta("Error: No puedes guardar una rutina vacía.");
+            return;
+        }
 
-        ScriptData nuevoScript = new ScriptData(nombre, comandosActuales);
+        // Crear y Guardar
+        ScriptData nuevoScript = new ScriptData(nombreElegido, comandosActuales);
         baseDeDatos.savedScripts.Add(nuevoScript);
 
         GuardarEnDisco();
         ActualizarDropdown();
+
+        // Cerrar panel y mostrar éxito
+        panelNombreScript.SetActive(false);
+        progManager.MostrarAlerta("¡Rutina guardada con éxito!");
     }
+
+    // --- RESTO DEL CÓDIGO (IGUAL QUE ANTES) ---
 
     void GuardarEnDisco()
     {
         string json = JsonUtility.ToJson(baseDeDatos, true);
         File.WriteAllText(filePath, json);
-        Debug.Log("Guardado en: " + filePath);
     }
-
-    // En ScriptManager.cs
 
     void CargarBaseDeDatos()
     {
         if (File.Exists(filePath))
         {
-            // El archivo existe, lo leemos
             string json = File.ReadAllText(filePath);
             baseDeDatos = JsonUtility.FromJson<ScriptDataWrapper>(json);
         }
         else
         {
-            // --- AQUÍ ESTÁ LA CLAVE ---
-            // El archivo NO existe, así que creamos los defaults
             baseDeDatos = new ScriptDataWrapper();
-            CrearRutinasDefault(); // <--- ¡Asegúrate de que esta línea esté aquí!
+            CrearRutinasDefault(); // Recuerda tu función de defaults aquí
             GuardarEnDisco();
         }
     }
 
+    // (Pega aquí tu función CrearRutinasDefault que ya tenías)
     void CrearRutinasDefault()
     {
-        // --- EJEMPLO 1: Patrulla Simple ---
-        List<string> comandosPatrulla = new List<string>();
-        // Tienes que escribirlos en el formato interno "TIPO|PARAMETROS"
-        comandosPatrulla.Add("MOVER|N");
-        comandosPatrulla.Add("MOVER|N");
-        comandosPatrulla.Add("MOVER|S");
-        comandosPatrulla.Add("MOVER|S");
+        // --- RUTINA 1: EL TANQUE INMORTAL ---
+        // Estrategia: Prioriza curarse si está herido. Si ve a alguien al frente, dispara torpedo. Si no, avanza.
+        List<string> rutinaTanque = new List<string>();
 
-        ScriptData rutina1 = new ScriptData();
-        rutina1.nombre = "Patrulla Norte-Sur";
-        rutina1.comandosEnTexto = comandosPatrulla;
-        baseDeDatos.savedScripts.Add(rutina1);
+        // 1. ¿Tengo poca vida? (Menos de 50) -> Me Curo
+        rutinaTanque.Add("IF|Salud|<|50|0|REPARAR");
 
-        // --- EJEMPLO 2: Buscador Agresivo (Con Radar) ---
-        List<string> comandosAtaque = new List<string>();
-        // IF(RADAR(N) > 0): TORPEDO(N) -> "IF|Radar_N|>|0|0|TORPEDO|N"
-        // (Nota: el segundo 0 es el parametroExtra que ya no usamos, y el ultimo es la accion)
-        comandosAtaque.Add("IF|Radar_N|>|0|0|TORPEDO|N");
-        comandosAtaque.Add("MOVER|N"); // Si no hay nadie, avanza
+        // 2. ¿Hay enemigo al Norte? -> Torpedo
+        rutinaTanque.Add("IF|Radar_N|>|0|0|TORPEDO|N");
 
-        ScriptData rutina2 = new ScriptData();
-        rutina2.nombre = "Buscador Agresivo";
-        rutina2.comandosEnTexto = comandosAtaque;
-        baseDeDatos.savedScripts.Add(rutina2);
+        // 3. ¿Hay pared al Norte? -> Me muevo al Sur (Rebote)
+        rutinaTanque.Add("IF|Radar_N|<|0|0|MOVER|S");
 
-        // --- EJEMPLO 3: Minador Miedoso ---
-        List<string> comandosMina = new List<string>();
-        comandosMina.Add("PLANTAR_MINA|S"); // Pone mina al sur (avanza al sur y la deja)
-        comandosMina.Add("MOVER|E");       // Huye al este
+        // 4. Si nada de lo anterior pasó, avanzo implacable
+        rutinaTanque.Add("MOVER|N");
 
-        ScriptData rutina3 = new ScriptData();
-        rutina3.nombre = "Minador Táctico";
-        rutina3.comandosEnTexto = comandosMina;
-        baseDeDatos.savedScripts.Add(rutina3);
+        ScriptData r1 = new ScriptData();
+        r1.nombre = "Tanque Inmortal";
+        r1.comandosEnTexto = rutinaTanque;
+        baseDeDatos.savedScripts.Add(r1);
+
+
+        // --- RUTINA 2: ARTILLERÍA PESADA (Cañonero) ---
+        // Estrategia: Dispara cañones en espiral cubriendo varias distancias y luego se mueve.
+        List<string> rutinaArtilleria = new List<string>();
+
+        // Dispara a distancia 3 al Norte
+        rutinaArtilleria.Add("CAÑON|N|N|3");
+        // Dispara a distancia 3 al Este
+        rutinaArtilleria.Add("CAÑON|E|E|3");
+        // Dispara a distancia 3 al Sur
+        rutinaArtilleria.Add("CAÑON|S|S|3");
+        // Dispara a distancia 3 al Oeste
+        rutinaArtilleria.Add("CAÑON|O|O|3");
+        // Se mueve para no ser un blanco fácil
+        rutinaArtilleria.Add("MOVER|N");
+
+        ScriptData r2 = new ScriptData();
+        r2.nombre = "Artillería Rotatoria";
+        r2.comandosEnTexto = rutinaArtilleria;
+        baseDeDatos.savedScripts.Add(r2);
+
+
+        // --- RUTINA 3: EL MINADOR TÁCTICO ---
+        // Estrategia: Se mueve dejando un rastro de minas. Si ve una pared, gira.
+        List<string> rutinaMinador = new List<string>();
+
+        // 1. Intenta avanzar al Norte dejando una mina atrás
+        rutinaMinador.Add("PLANTAR_MINA|N");
+
+        // 2. Si hay pared al Norte, planta mina hacia el Este (Gira)
+        rutinaMinador.Add("IF|Radar_N|<|0|0|PLANTAR_MINA|E");
+
+        // 3. Si hay enemigo cerca al Sur (atrás), le dispara un Torpedo
+        rutinaMinador.Add("IF|Radar_S|>|0|0|TORPEDO|S");
+
+        // 4. Se recupera por el esfuerzo
+        rutinaMinador.Add("REPARAR");
+
+        ScriptData r3 = new ScriptData();
+        r3.nombre = "Minador Táctico";
+        r3.comandosEnTexto = rutinaMinador;
+        baseDeDatos.savedScripts.Add(r3);
+
+
+        // --- RUTINA 4: FRANCOTIRADOR (Sniper) ---
+        // Estrategia: Usa el radar para confirmar blanco antes de disparar el cañón.
+        List<string> rutinaSniper = new List<string>();
+
+        // Escanea los 4 puntos cardinales. Si ve a alguien, dispara CAÑÓN preciso (distancia 2)
+        rutinaSniper.Add("IF|Radar_N|>|0|0|CAÑON|N|N|2");
+        rutinaSniper.Add("IF|Radar_E|>|0|0|CAÑON|E|E|2");
+        rutinaSniper.Add("IF|Radar_S|>|0|0|CAÑON|S|S|2");
+        rutinaSniper.Add("IF|Radar_O|>|0|0|CAÑON|O|O|2");
+
+        // Movimiento evasivo en diagonal (Norte luego Este)
+        rutinaSniper.Add("MOVER|N");
+        rutinaSniper.Add("MOVER|E");
+
+        ScriptData r4 = new ScriptData();
+        r4.nombre = "Francotirador";
+        r4.comandosEnTexto = rutinaSniper;
+        baseDeDatos.savedScripts.Add(r4);
     }
-
-    // --- UI DROPDOWN ---
 
     void ActualizarDropdown()
     {
         dropdownScripts.ClearOptions();
         List<string> opciones = new List<string>();
-        opciones.Add("Seleccionar Script..."); // Opción 0 neutra
+        opciones.Add("");
 
         foreach (var s in baseDeDatos.savedScripts)
         {
@@ -151,15 +222,10 @@ public class ScriptManager : MonoBehaviour
 
     void OnDropdownChanged(int index)
     {
-        if (index == 0) return; // Seleccionó el título
-
-        indiceSeleccionadoEnDropdown = index - 1; // Ajustamos porque el 0 es texto
-
-        // Mostrar panel de opciones
+        if (index == 0) return;
+        indiceSeleccionadoEnDropdown = index - 1;
         panelOpcionesScript.SetActive(true);
     }
-
-    // --- ACCIONES DE CARGA/BORRADO ---
 
     void OnClick_Cargar()
     {
@@ -173,12 +239,11 @@ public class ScriptManager : MonoBehaviour
             comandosRecuperados.Add(ScriptData.DeserializarComando(linea));
         }
 
-        // Enviamos al LogicBuilder
         logicBuilder.CargarScriptExterno(comandosRecuperados);
-
         panelOpcionesScript.SetActive(false);
-        // Resetear dropdown visualmente sin disparar evento
         dropdownScripts.SetValueWithoutNotify(0);
+
+        progManager.MostrarAlerta("Rutina cargada correctamente.");
     }
 
     void OnClick_Borrar()
@@ -191,5 +256,7 @@ public class ScriptManager : MonoBehaviour
 
         panelOpcionesScript.SetActive(false);
         dropdownScripts.SetValueWithoutNotify(0);
+
+        progManager.MostrarAlerta("Rutina eliminada.");
     }
 }

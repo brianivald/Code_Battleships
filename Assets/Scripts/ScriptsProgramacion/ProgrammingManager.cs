@@ -79,7 +79,7 @@ public class ProgrammingManager : MonoBehaviour
 
     // --- SISTEMA DE MENSAJES TEMPORALES ---
 
-    void MostrarAlerta(string mensaje)
+    public void MostrarAlerta(string mensaje)
     {
         // Si ya había un mensaje mostrándose, cancelamos su temporizador anterior
         if (corrutinaAlertaActual != null) StopCoroutine(corrutinaAlertaActual);

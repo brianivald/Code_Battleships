@@ -825,6 +825,7 @@ GameObject:
   - component: {fileID: 1274119408}
   - component: {fileID: 1274119407}
   - component: {fileID: 1274119406}
+  - component: {fileID: 1274119409}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -875,7 +876,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6.5532994
+  orthographic size: 6.2040443
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -900,12 +901,29 @@ Transform:
   m_GameObject: {fileID: 1274119405}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 10.67, y: 10, z: 2.61}
+  m_LocalPosition: {x: 9.625, y: 10, z: 3.0818014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1274119409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274119405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d94bc0fb8cfef94d980855c85b885f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  cam: {fileID: 1274119407}
+  margenIzquierdo: 0.041
+  margenDerechoUI: 0.551
+  margenSuperior: 0.059
+  margenInferior: 0.207
 --- !u!1 &2001238436
 GameObject:
   m_ObjectHideFlags: 0

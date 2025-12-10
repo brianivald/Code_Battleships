@@ -23,11 +23,18 @@ public class Tablero : MonoBehaviour
 
     void Awake()
     {
-        // Configuraci�n del Singleton
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-        ancho = GameSession.tamanoTablero;
-        alto = GameSession.tamanoTablero;
+
+        // --- LEER CONFIGURACIÓN ---
+        // Si tamanoTablero es 0 (ej. pruebas directas), usa el valor por defecto 10
+        if (GameSession.tamanoTablero > 0)
+        {
+            ancho = GameSession.tamanoTablero;
+            alto = GameSession.tamanoTablero;
+        }
+        // --------------------------
+
         InicializarTablero();
     }
 
