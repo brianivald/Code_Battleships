@@ -14,18 +14,18 @@ public class LogicBuilder : MonoBehaviour
     [Header("Botones de Comando")]
     public Button btnMover, btnTorpedo, btnPlantarMina, btnCanon, btnIf, btnReparar;
 
-    [Header("Botones de Par�metros")]
+    [Header("Botones de Parametros")]
     public Button btnNorte, btnSur, btnEste, btnOeste;
     public Button btnSalud, btnRadar;
     public Button btnMenorQue, btnMayorQue, btnIgualA, btnMenos;
 
-    [Header("Botones Num�ricos (0-9)")]
+    [Header("Botones Numericos (0-9)")]
     public Button[] botonesNumeros;
 
     [Header("Botones de Control")]
     public Button btnBorrar, btnGuardar;
 
-    [Header("Conexi�n al Manager")]
+    [Header("Conexion al Manager")]
     public ProgrammingManager manager;
 
     // --- Estado Interno ---
@@ -137,7 +137,7 @@ public class LogicBuilder : MonoBehaviour
     void OnClick_Mover() => IniciarComando("MOVER", EstadoConstruccion.EsperandoDireccion);
     void OnClick_Torpedo() => IniciarComando("TORPEDO", EstadoConstruccion.EsperandoDireccion);
     void OnClick_PlantarMina() => IniciarComando("PLANTAR_MINA", EstadoConstruccion.EsperandoDireccion);
-    void OnClick_Canon() => IniciarComando("CA�ON", EstadoConstruccion.EsperandoDirCanon1);
+    void OnClick_Canon() => IniciarComando("CAÑON", EstadoConstruccion.EsperandoDirCanon1);
 
     void OnClick_If()
     {

@@ -7,7 +7,7 @@ public class ControladorDeBarco : MonoBehaviour
 {
     [Header("Identificación")]
     public int idJugador; // <--- NUEVO: Para saber a quién sumar el punto
-    [Header("Configuraci�n")]
+    [Header("Configuración")]
     public float velocidadAnimacion = 2.0f;
     public int salud = 0;
     public int minasRestantes = 0;
@@ -18,7 +18,7 @@ public class ControladorDeBarco : MonoBehaviour
     public GameObject prefabTorpedo;
     public GameObject prefabMina;
 
-    // Posici�n l�gica en el tablero (X, Y)
+    // Posicion logica en el tablero (X, Y)
     public Vector2Int posicionGrid;
     public Direccion orientacionActual = Direccion.Norte;
 
@@ -33,7 +33,7 @@ public class ControladorDeBarco : MonoBehaviour
         reparacionesRestantes = GameSession.reparacionesMaximas;
     }
 
-    // --- L�gica de Ejecuci�n de Turno ---
+    // --- Logica de Ejecucion de Turno ---
 
     public void EjecutarSiguienteComando()
     {
@@ -62,10 +62,10 @@ public class ControladorDeBarco : MonoBehaviour
             // 1. Checar si pisamos una mina ANTES de movernos
             if (Tablero.Instance.GetContenido(nuevaPos) == Tablero.TipoCelda.Mina)
             {
-                Debug.Log("�BOOM! Has pisado una mina.");
+                Debug.Log("BOOM! Has pisado una mina.");
                 RecibirDano(50);
 
-                // Destruir la mina visual y l�gica
+                // Destruir la mina visual y logica
                 GameObject minaObj = Tablero.Instance.GetObjetoEn(nuevaPos);
                 if (minaObj != null) Destroy(minaObj);
                 Tablero.Instance.EliminarObjeto(nuevaPos);
@@ -91,14 +91,14 @@ public class ControladorDeBarco : MonoBehaviour
             // CASO 1: Choque contra PARED (Fuera del mapa)
             if (obstaculo == Tablero.TipoCelda.FueraDeLimites)
             {
-                Debug.Log($"�CRASH! {gameObject.name} choc� contra la costa.");
+                Debug.Log($"¡CRASH! {gameObject.name} chocó contra la costa.");
                 RecibirDano(15); // Da�o por chocar con tierra
             }
 
             // CASO 2: Choque contra OTRO BARCO (Ramming)
             else if (obstaculo == Tablero.TipoCelda.Barco)
             {
-                Debug.Log($"�PUM! {gameObject.name} embisti� a otro barco.");
+                Debug.Log($"¡PUM! {gameObject.name} embistió a otro barco.");
 
                 // 1. Me hago da�o a m� mismo
                 RecibirDano(20);
